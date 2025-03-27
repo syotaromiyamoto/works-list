@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品リスト</title>
+    <script src="https://unpkg.com/tabletop@1.5.1/tabletop.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+        .accordion {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .accordion-header {
+            padding: 15px;
+            cursor: pointer;
+            background: #e9f1f7;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .accordion-header:hover {
+            background: #d2e6f4;
+        }
+        .accordion-body {
+            display: none;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background: #fafafa;
+        }
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>作品リスト</h1>
+    <div id="list"></div>
+
+    <script>
+        window.onload = function() {
+            var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1R9PCc4Xi0aCdhJdzrjfn2zNi1OMkqqZaI6r_xWJKkyo/pubhtml';
+
+            Tabletop.init({
+                key: publicSpreadsheetUrl,
+                simpleSheet: true,
+                callback: function(data) {
+                    var list = document.getElementById('list');
+                    data.forEach(function(item) {
+                        var acc = document.createElement('div');
+                        acc.className = 'accordion';
+
+                        var header = document.createElement('div');
+                        header.className = 'accordion-header';
+                        header.innerText = item['曲名'];
+                        header.onclick = function() {
+                            var body = this.nextElementSibling;
+                            body.style.display = (body.style.display === 'block') ? 'none' : 'block';
+                        };
+
+                        var body = document.createElement('div');
+                        body.className = 'accordion-body';
+
+                        body.innerHTML = `
+                            <p><strong>委嘱者:</strong> ${item['委嘱者']}</p>
+                            <p><strong>初演者:</strong> ${item['初演者']}</p>
+                            <p><strong>初演年:</strong> ${item['初演年']}</p>
+                            <p><strong>編成:</strong> ${item['編成']}</p>
+                            <p><strong>出版社:</strong> ${item['出版社']}</p>
+                            <p><strong>備考:</strong> ${linkify(item['備考'])}</p>
+                        `;
+
+                        acc.appendChild(header);
+                        acc.appendChild(body);
+                        list.appendChild(acc);
+                    });
+                }
+            });
+
+            function linkify(text) {
+                if (!text) return '';
+                return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+            }
+        }
+    </script>
+
+</body>
+</html>
